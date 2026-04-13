@@ -272,9 +272,9 @@ export default function SubmissionDetail() {
   return (
     <div className="min-h-screen bg-[#D7F36A] text-black p-4 md:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="space-y-4">
           <div>
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-2xl md:text-3xl font-bold">
               {[submission.firstName, submission.lastName].filter(Boolean).join(" ") || "Submission"}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -288,13 +288,13 @@ export default function SubmissionDetail() {
               })}
             </p>
           </div>
-          <div className="flex gap-2 shrink-0">
-            <Button onClick={() => exportPDF(submission)}>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => exportPDF(submission)} className="flex-1 sm:flex-none">
               <Download className="h-4 w-4 mr-2" />
               Export PDF
             </Button>
-            <Link to="/admin/dashboard">
-              <Button variant="outline">Back to List</Button>
+            <Link to="/admin/dashboard" className="flex-1 sm:flex-none">
+              <Button variant="outline" className="w-full">Back to List</Button>
             </Link>
           </div>
         </div>

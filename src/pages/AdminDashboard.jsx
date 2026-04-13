@@ -47,19 +47,19 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D7F36A] text-black p-4 md:p-8">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <div className="min-h-screen bg-[#D7F36A] text-black p-3 sm:p-4 md:p-8">
+      <div className="mx-auto max-w-5xl space-y-4 md:space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">a creative mess</h1>
-            <p className="text-sm">admin dashboard</p>
+            <h1 className="text-2xl md:text-3xl font-bold">a creative mess</h1>
+            <p className="text-xs md:text-sm">admin dashboard</p>
           </div>
-          <Button variant="outline" onClick={handleLogout}>
+          <Button variant="outline" size="sm" onClick={handleLogout}>
             Log Out
           </Button>
         </div>
 
-        <Card className="rounded-3xl border-2 border-black bg-white">
+        <Card className="rounded-2xl md:rounded-3xl border-2 border-black bg-white">
           <CardHeader>
             <CardTitle>Submissions</CardTitle>
             <CardDescription>
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
               {submissions.map((sub) => (
                 <div
                   key={sub.id}
-                  className="flex items-center justify-between gap-4 rounded-2xl border-2 border-black p-4 hover:bg-gray-50 transition"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border-2 border-black p-3 sm:p-4 hover:bg-gray-50 transition"
                 >
                   <Link
                     to={`/admin/submission/${sub.id}`}
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(sub.id)}
-                    className="shrink-0 text-red-600 border-red-300 hover:bg-red-50"
+                    className="shrink-0 text-red-600 border-red-300 hover:bg-red-50 self-end sm:self-center"
                   >
                     Delete
                   </Button>

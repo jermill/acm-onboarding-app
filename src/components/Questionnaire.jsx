@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle, User } from "lucide-react";
+import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle, User, ChevronDown, ChevronUp } from "lucide-react";
 
 const sections = [
   { id: "client", title: "Client Info", icon: User },
@@ -178,7 +178,7 @@ function CheckboxField({ label, checked, onChange }) {
 
 function CreativeMessLogo() {
   return (
-    <div className="relative w-28 h-28">
+    <div className="relative w-16 h-16 md:w-28 md:h-28 shrink-0">
       <motion.div
         animate={{ rotate: [0, 2, -2, 0] }}
         transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
@@ -190,7 +190,7 @@ function CreativeMessLogo() {
         className="absolute inset-0 rounded-full border-2 border-black"
       />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-3 h-3 bg-black rounded-full" />
+        <div className="w-2 h-2 md:w-3 md:h-3 bg-black rounded-full" />
       </div>
     </div>
   );
@@ -202,7 +202,7 @@ function ScribbleArrow() {
       width="120"
       height="60"
       viewBox="0 0 120 60"
-      className="absolute -top-6 right-6 opacity-70"
+      className="absolute -top-6 right-6 opacity-70 hidden lg:block"
       initial={{ pathLength: 0 }}
       animate={{ pathLength: 1 }}
       transition={{ duration: 1.5, ease: "easeInOut" }}
@@ -947,22 +947,81 @@ export default function Questionnaire() {
     }
   }
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const StepIcon = sections[step].icon;
+
   return (
-    <div className="min-h-screen bg-[#D7F36A] text-black p-4 md:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+    <div className="min-h-screen bg-[#D7F36A] text-black p-3 sm:p-4 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-4 md:space-y-6">
         {/* Brand Header */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <CreativeMessLogo />
           <div>
-            <h1 className="text-3xl font-bold">a creative mess</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">a creative mess</h1>
             <p className="text-xs uppercase tracking-wide">client intake app</p>
-            <p className="text-sm">project discovery questionnaire</p>
+            <p className="text-xs md:text-sm">project discovery questionnaire</p>
           </div>
+        </div>
+
+        {/* Mobile: compact progress + collapsible nav */}
+        <div className="lg:hidden space-y-3">
+          <Card className="rounded-2xl shadow-sm border-2 border-black bg-white">
+            <CardContent className="p-4 space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <StepIcon className="h-4 w-4" />
+                  <span className="font-medium">{sections[step].title}</span>
+                </div>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-black transition"
+              >
+                {sidebarOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {sidebarOpen ? "Hide steps" : "Show all steps"}
+              </button>
+              {sidebarOpen && (
+                <div className="space-y-1.5 pt-1">
+                  {sections.map((section, index) => {
+                    const Icon = section.icon;
+                    const active = index === step;
+                    const completed = index < highestReachableStep || (index === highestReachableStep && isStepComplete(section.id));
+                    const locked = index > highestReachableStep;
+                    return (
+                      <button
+                        key={section.id}
+                        type="button"
+                        onClick={() => { goToStep(index); setSidebarOpen(false); }}
+                        className={`flex w-full items-center gap-2 rounded-xl border-2 px-3 py-2 text-left transition text-sm ${
+                          active
+                            ? "bg-black text-white border-black"
+                            : locked
+                            ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                            : "bg-white hover:bg-black hover:text-white border-black"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span className="flex-1 font-medium">{section.title}</span>
+                        {completed && !active && (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-green-600 shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="relative grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <ScribbleArrow />
-          <Card className="h-fit rounded-3xl shadow-sm border-2 border-black bg-white">
+          {/* Desktop sidebar — hidden on mobile */}
+          <Card className="hidden lg:block h-fit rounded-3xl shadow-sm border-2 border-black bg-white">
             <CardHeader>
               <CardTitle className="text-xl">a creative mess</CardTitle>
               <CardDescription>
@@ -1017,15 +1076,15 @@ export default function Questionnaire() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="rounded-3xl shadow-sm border-2 border-black bg-white">
-              <CardHeader>
-                <CardTitle>{sections[step].title}</CardTitle>
+            <Card className="rounded-2xl md:rounded-3xl shadow-sm border-2 border-black bg-white">
+              <CardHeader className="p-4 md:p-6">
+                <CardTitle className="text-lg md:text-xl">{sections[step].title}</CardTitle>
                 <CardDescription>
                   messy ideas welcome — clarity comes later
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="space-y-8">
+              <CardContent className="space-y-6 md:space-y-8 p-4 md:p-6 pt-0">
                 {renderStepContent()}
 
                 {attempted[sections[step].id] && !isCurrentStepValid && (
@@ -1062,7 +1121,7 @@ export default function Questionnaire() {
       </div>
 
       <Dialog open={submitted} onOpenChange={setSubmitted}>
-        <DialogContent>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-lg">
           <DialogHeader className="items-center">
             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#D7F36A] mb-2">
               <CheckCircle2 className="h-8 w-8 text-black" />
