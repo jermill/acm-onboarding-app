@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Download } from "lucide-react";
+import jsPDF from "jspdf";
 
 const fieldLabels = {
   firstName: "First Name",
@@ -100,7 +102,113 @@ const sectionOrder = [
   },
 ];
 
-const skipFields = ["id", "submittedAt"];
+function formatValue(value) {
+  if (typeof value === "boolean") return value ? "Yes" : "No";
+  if (Array.isArray(value)) return value.length > 0 ? value.join(", ") : "None selected";
+  if (!value && value !== false) return "Not provided";
+  return String(value);
+}
+
+function exportPDF(submission) {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  const maxWidth = pageWidth - margin * 2;
+  let y = 20;
+
+  const checkPage = (needed = 20) => {
+    if (y + needed > doc.internal.pageSize.getHeight() - 20) {
+      doc.addPage();
+      y = 20;
+    }
+  };
+
+  // Header
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.text("a creative mess", margin, y);
+  y += 8;
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(100);
+  doc.text("Project Discovery Questionnaire", margin, y);
+  y += 6;
+
+  const clientName = [submission.firstName, submission.lastName].filter(Boolean).join(" ") || "Unknown Client";
+  doc.text(`Client: ${clientName}`, margin, y);
+  y += 5;
+  doc.text(
+    `Submitted: ${new Date(submission.submittedAt).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    })}`,
+    margin,
+    y
+  );
+  y += 4;
+
+  // Divider line
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 10;
+  doc.setTextColor(0);
+
+  for (const section of sectionOrder) {
+    const filledKeys = section.keys.filter((k) => {
+      if (!(k in submission)) return false;
+      const v = submission[k];
+      return typeof v === "boolean" ? v : !!v;
+    });
+    if (filledKeys.length === 0) continue;
+
+    checkPage(30);
+
+    // Section title
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(section.title, margin, y);
+    y += 2;
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.3);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 8;
+
+    for (const key of filledKeys) {
+      const label = fieldLabels[key] || key;
+      const value = formatValue(submission[key]);
+
+      checkPage(20);
+
+      // Label
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(100);
+      doc.text(label.toUpperCase(), margin, y);
+      y += 5;
+
+      // Value (with text wrapping)
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(0);
+      const lines = doc.splitTextToSize(value, maxWidth);
+      for (const line of lines) {
+        checkPage(7);
+        doc.text(line, margin, y);
+        y += 6;
+      }
+      y += 4;
+    }
+
+    y += 4;
+  }
+
+  const fileName = `${clientName.replace(/\s+/g, "_")}_questionnaire.pdf`;
+  doc.save(fileName);
+}
 
 function FieldValue({ value }) {
   if (typeof value === "boolean") {
@@ -164,9 +272,11 @@ export default function SubmissionDetail() {
   return (
     <div className="min-h-screen bg-[#D7F36A] text-black p-4 md:p-8">
       <div className="mx-auto max-w-3xl space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Submission</h1>
+            <h1 className="text-3xl font-bold">
+              {[submission.firstName, submission.lastName].filter(Boolean).join(" ") || "Submission"}
+            </h1>
             <p className="text-sm text-muted-foreground">
               Submitted{" "}
               {new Date(submission.submittedAt).toLocaleDateString("en-US", {
@@ -178,9 +288,15 @@ export default function SubmissionDetail() {
               })}
             </p>
           </div>
-          <Link to="/admin/dashboard">
-            <Button variant="outline">Back to List</Button>
-          </Link>
+          <div className="flex gap-2 shrink-0">
+            <Button onClick={() => exportPDF(submission)}>
+              <Download className="h-4 w-4 mr-2" />
+              Export PDF
+            </Button>
+            <Link to="/admin/dashboard">
+              <Button variant="outline">Back to List</Button>
+            </Link>
+          </div>
         </div>
 
         {sectionOrder.map((section) => {
