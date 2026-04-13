@@ -24,6 +24,19 @@ const sections = [
   { id: "review", title: "Review & Submit", icon: CheckCircle2 },
 ];
 
+// Required fields per section (checkboxes are optional since they default to false)
+const requiredFields = {
+  overview: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
+  dating: ["datingHowItWorks", "datingAccounts", "datingProfiles", "datingInteraction", "datingPurpose", "datingDeviceFocus", "datingPayments"],
+  podcast: ["podcastHosting", "podcastHowItWorks", "podcastParticipateWhileListening", "podcastSubmitAnswers", "podcastScoringResults", "podcastAccounts", "podcastAdminUpload"],
+  design: ["stylePreference", "colorPreferences", "simpleOrFeatureRich", "animations"],
+  technical: ["userLogins", "adminPanel", "saveProgress", "emailNotifications", "socialLogin", "scalability"],
+  timeline: ["launchDate", "hardDeadline", "prioritySite"],
+  budget: ["budgetRange"],
+  final: ["hostingSetup", "domainPurchase", "ongoingMaintenance", "futureApp"],
+  review: [],
+};
+
 const initialData = {
   // Overview
   separateOrConnected: "",
@@ -332,7 +345,56 @@ export default function Questionnaire() {
   const [error, setError] = useState(null);
   const [form, setForm] = useState(initialData);
 
+  const [attempted, setAttempted] = useState({});
+
   const progress = useMemo(() => ((step + 1) / sections.length) * 100, [step]);
+
+  const isStepComplete = (sectionId) => {
+    const fields = requiredFields[sectionId] || [];
+    return fields.every((key) => {
+      const val = form[key];
+      if (typeof val === "boolean") return true;
+      if (typeof val === "string") return val.trim() !== "";
+      return !!val;
+    });
+  };
+
+  // Extra validation: if budget is "custom", customBudget is also required
+  const isCurrentStepValid = useMemo(() => {
+    const sectionId = sections[step].id;
+    if (!isStepComplete(sectionId)) return false;
+    if (sectionId === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) return false;
+    if (sectionId === "design" && form.stylePreference === "other" && !form.styleOther.trim()) return false;
+    return true;
+  }, [step, form]);
+
+  const getMissingFields = (sectionId) => {
+    const fields = requiredFields[sectionId] || [];
+    const missing = fields.filter((key) => {
+      const val = form[key];
+      if (typeof val === "boolean") return false;
+      if (typeof val === "string") return val.trim() === "";
+      return !val;
+    });
+    if (sectionId === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) {
+      missing.push("customBudget");
+    }
+    if (sectionId === "design" && form.stylePreference === "other" && !form.styleOther.trim()) {
+      missing.push("styleOther");
+    }
+    return missing;
+  };
+
+  // Highest step the user has fully completed (allows going back but not skipping ahead)
+  const highestReachableStep = useMemo(() => {
+    for (let i = 0; i < sections.length; i++) {
+      if (!isStepComplete(sections[i].id)) return i;
+      // check conditional fields too
+      if (sections[i].id === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) return i;
+      if (sections[i].id === "design" && form.stylePreference === "other" && !form.styleOther.trim()) return i;
+    }
+    return sections.length - 1;
+  }, [form]);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -354,8 +416,21 @@ export default function Questionnaire() {
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
-  const next = () => setStep((s) => Math.min(s + 1, sections.length - 1));
+  const next = () => {
+    setAttempted((prev) => ({ ...prev, [sections[step].id]: true }));
+    if (!isCurrentStepValid) return;
+    setStep((s) => Math.min(s + 1, sections.length - 1));
+  };
   const back = () => setStep((s) => Math.max(s - 1, 0));
+  const goToStep = (index) => {
+    // Can always go back, but can only go forward if all prior steps are complete
+    if (index <= step || index <= highestReachableStep) {
+      setStep(index);
+    } else {
+      // Mark current step as attempted to show validation
+      setAttempted((prev) => ({ ...prev, [sections[step].id]: true }));
+    }
+  };
 
   const yesNoOptions = [
     { value: "yes", label: "Yes" },
@@ -842,20 +917,29 @@ export default function Questionnaire() {
                 {sections.map((section, index) => {
                   const Icon = section.icon;
                   const active = index === step;
+                  const completed = index < highestReachableStep || (index === highestReachableStep && isStepComplete(section.id));
+                  const locked = index > highestReachableStep;
                   return (
                     <button
                       key={section.id}
                       type="button"
-                      onClick={() => setStep(index)}
-                      className={`flex w-full items-center gap-3 rounded-2xl border-2 border-black px-3 py-3 text-left transition ${
-                        active ? "bg-black text-white" : "bg-white hover:bg-black hover:text-white"
+                      onClick={() => goToStep(index)}
+                      className={`flex w-full items-center gap-3 rounded-2xl border-2 px-3 py-3 text-left transition ${
+                        active
+                          ? "bg-black text-white border-black"
+                          : locked
+                          ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                          : "bg-white hover:bg-black hover:text-white border-black"
                       }`}
                     >
                       <Icon className="h-4 w-4" />
-                      <div>
+                      <div className="flex-1">
                         <div className="text-sm font-medium">{section.title}</div>
                         <div className="text-xs opacity-70">Step {index + 1}</div>
                       </div>
+                      {completed && !active && (
+                        <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
+                      )}
                     </button>
                   );
                 })}
@@ -878,6 +962,12 @@ export default function Questionnaire() {
 
               <CardContent className="space-y-8">
                 {renderStepContent()}
+
+                {attempted[sections[step].id] && !isCurrentStepValid && (
+                  <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-4 text-amber-800 text-sm">
+                    Please answer all questions before continuing.
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm">Step {step + 1} of {sections.length}</div>
