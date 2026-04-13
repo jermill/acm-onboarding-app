@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle } from "lucide-react";
 
 const sections = [
@@ -990,17 +991,43 @@ export default function Questionnaire() {
                     {error}
                   </div>
                 )}
-
-                {submitted && (
-                  <div className="rounded-2xl border-2 border-black p-4 bg-white">
-                    Submitted. Time to turn chaos into a plan.
-                  </div>
-                )}
               </CardContent>
             </Card>
           </motion.div>
         </div>
       </div>
+
+      <Dialog open={submitted} onOpenChange={setSubmitted}>
+        <DialogContent>
+          <DialogHeader className="items-center">
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#D7F36A] mb-2">
+              <CheckCircle2 className="h-8 w-8 text-black" />
+            </div>
+            <DialogTitle className="text-2xl text-center">You're all set!</DialogTitle>
+            <DialogDescription className="text-center text-base pt-2">
+              Your questionnaire has been submitted successfully. We'll review your answers and get back to you soon.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-2xl bg-gray-50 border-2 border-gray-200 p-4 text-center text-sm">
+            Time to turn chaos into a plan.
+          </div>
+          <DialogFooter className="sm:justify-center pt-2">
+            <DialogClose asChild>
+              <Button
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  setForm(initialData);
+                  setStep(0);
+                  setSubmitted(false);
+                  setAttempted({});
+                }}
+              >
+                Done
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
