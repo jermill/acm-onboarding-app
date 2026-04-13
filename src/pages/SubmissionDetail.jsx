@@ -6,6 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
 const fieldLabels = {
+  firstName: "First Name",
+  lastName: "Last Name",
+  contactNumber: "Contact Number",
+  email: "Email",
+  currentWebsite: "Current Website",
   separateOrConnected: "Separate or Connected?",
   goalDating: "Main Goal — Dating Game",
   goalPodcast: "Main Goal — Podcast Game",
@@ -57,6 +62,10 @@ const fieldLabels = {
 };
 
 const sectionOrder = [
+  {
+    title: "Client Info",
+    keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite"],
+  },
   {
     title: "Project Overview",
     keys: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],

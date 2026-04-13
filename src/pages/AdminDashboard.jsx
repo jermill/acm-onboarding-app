@@ -86,14 +86,10 @@ export default function AdminDashboard() {
                     className="flex-1 min-w-0"
                   >
                     <div className="font-medium truncate">
-                      {sub.goalDating || sub.goalPodcast || "New Submission"}
+                      {[sub.firstName, sub.lastName].filter(Boolean).join(" ") || "New Submission"}
                     </div>
                     <div className="text-sm text-muted-foreground truncate">
-                      {sub.separateOrConnected === "separate"
-                        ? "Separate sites"
-                        : sub.separateOrConnected === "connected"
-                        ? "Connected sites"
-                        : "No details yet"}
+                      {sub.email || "No email provided"}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs">

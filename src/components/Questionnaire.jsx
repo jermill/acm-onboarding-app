@@ -11,9 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle } from "lucide-react";
+import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle, User } from "lucide-react";
 
 const sections = [
+  { id: "client", title: "Client Info", icon: User },
   { id: "overview", title: "Project Overview", icon: Globe },
   { id: "dating", title: "Dating Game Website", icon: FileText },
   { id: "podcast", title: "Podcast Relationship Game", icon: FileText },
@@ -27,6 +28,7 @@ const sections = [
 
 // Required fields per section (checkboxes are optional since they default to false)
 const requiredFields = {
+  client: ["firstName", "lastName", "contactNumber", "email"],
   overview: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
   dating: ["datingHowItWorks", "datingAccounts", "datingProfiles", "datingInteraction", "datingPurpose", "datingDeviceFocus", "datingPayments"],
   podcast: ["podcastHosting", "podcastHowItWorks", "podcastParticipateWhileListening", "podcastSubmitAnswers", "podcastScoringResults", "podcastAccounts", "podcastAdminUpload"],
@@ -39,6 +41,13 @@ const requiredFields = {
 };
 
 const initialData = {
+  // Client Info
+  firstName: "",
+  lastName: "",
+  contactNumber: "",
+  email: "",
+  currentWebsite: "",
+
   // Overview
   separateOrConnected: "",
   goalDating: "",
@@ -217,6 +226,11 @@ function ScribbleArrow() {
 }
 
 const fieldLabels = {
+  firstName: "First Name",
+  lastName: "Last Name",
+  contactNumber: "Contact Number",
+  email: "Email",
+  currentWebsite: "Current Website",
   separateOrConnected: "Separate or Connected?",
   goalDating: "Main Goal — Dating Game",
   goalPodcast: "Main Goal — Podcast Game",
@@ -269,6 +283,10 @@ const fieldLabels = {
 
 function ReviewSection({ form }) {
   const sectionGroups = [
+    {
+      title: "Client Info",
+      keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite"],
+    },
     {
       title: "Project Overview",
       keys: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
@@ -440,6 +458,52 @@ export default function Questionnaire() {
 
   function renderStepContent() {
     switch (sections[step].id) {
+      case "client":
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Field label="First Name">
+                <Input
+                  value={form.firstName}
+                  onChange={(e) => update("firstName", e.target.value)}
+                  placeholder="First name"
+                />
+              </Field>
+              <Field label="Last Name">
+                <Input
+                  value={form.lastName}
+                  onChange={(e) => update("lastName", e.target.value)}
+                  placeholder="Last name"
+                />
+              </Field>
+            </div>
+            <Field label="Contact Number">
+              <Input
+                type="tel"
+                value={form.contactNumber}
+                onChange={(e) => update("contactNumber", e.target.value)}
+                placeholder="(555) 123-4567"
+              />
+            </Field>
+            <Field label="Email">
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+                placeholder="you@example.com"
+              />
+            </Field>
+            <Field label="Current Website" hint="Optional">
+              <Input
+                type="url"
+                value={form.currentWebsite}
+                onChange={(e) => update("currentWebsite", e.target.value)}
+                placeholder="https://yoursite.com"
+              />
+            </Field>
+          </>
+        );
+
       case "overview":
         return (
           <>
