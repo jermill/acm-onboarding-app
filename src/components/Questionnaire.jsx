@@ -11,30 +11,31 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle, User, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, Globe, Palette, CalendarDays, DollarSign, Settings, CheckCircle2, HelpCircle, User, ChevronDown, ChevronUp, Layers, Package } from "lucide-react";
 
 const sections = [
   { id: "client", title: "Client Info", icon: User },
   { id: "overview", title: "Project Overview", icon: Globe },
-  { id: "dating", title: "Dating Game Website", icon: FileText },
-  { id: "podcast", title: "Podcast Relationship Game", icon: FileText },
+  { id: "details", title: "Project Details", icon: FileText },
+  { id: "features", title: "Features & Functionality", icon: Layers },
   { id: "design", title: "Design Preferences", icon: Palette },
-  { id: "technical", title: "Technical Questions", icon: Settings },
+  { id: "technical", title: "Technical Requirements", icon: Settings },
+  { id: "content", title: "Content & Assets", icon: Package },
   { id: "timeline", title: "Timeline", icon: CalendarDays },
   { id: "budget", title: "Budget Range", icon: DollarSign },
   { id: "final", title: "Final Questions", icon: HelpCircle },
   { id: "review", title: "Review & Submit", icon: CheckCircle2 },
 ];
 
-// Required fields per section (checkboxes are optional since they default to false)
 const requiredFields = {
   client: ["firstName", "lastName", "contactNumber", "email"],
-  overview: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
-  dating: ["datingHowItWorks", "datingAccounts", "datingProfiles", "datingInteraction", "datingPurpose", "datingDeviceFocus", "datingPayments"],
-  podcast: ["podcastHosting", "podcastHowItWorks", "podcastParticipateWhileListening", "podcastSubmitAnswers", "podcastScoringResults", "podcastAccounts", "podcastAdminUpload"],
+  overview: ["projectType", "projectGoal", "targetAudience", "hasBranding", "brandingHelp"],
+  details: ["projectDescription", "keyPages", "userInteraction"],
+  features: ["userAccounts", "deviceFocus"],
   design: ["stylePreference", "colorPreferences", "simpleOrFeatureRich", "animations"],
-  technical: ["userLogins", "adminPanel", "saveProgress", "emailNotifications", "socialLogin", "scalability"],
-  timeline: ["launchDate", "hardDeadline", "prioritySite"],
+  technical: ["userLogins", "adminPanel", "emailNotifications", "socialLogin", "scalability"],
+  content: ["hasContent", "needsCopywriting"],
+  timeline: ["launchDate", "hardDeadline"],
   budget: ["budgetRange"],
   final: ["hostingSetup", "domainPurchase", "ongoingMaintenance", "futureApp"],
   review: [],
@@ -47,95 +48,81 @@ const initialData = {
   contactNumber: "",
   email: "",
   currentWebsite: "",
+  companyName: "",
 
-  // Overview
-  separateOrConnected: "",
-  goalDating: "",
-  goalPodcast: "",
+  // Project Overview
+  projectType: "",
+  projectTypeOther: "",
+  projectGoal: "",
+  targetAudience: "",
   exampleSites: "",
   hasBranding: "",
   brandingHelp: "",
 
-  // Dating Game
-  datingHowItWorks: "",
-  datingAccounts: "",
-  datingProfiles: "",
-  datingInteraction: "",
-  datingPurpose: "",
-  datingMatchingSystem: false,
-  datingSwipeFeature: false,
-  datingGameRounds: false,
-  datingLeaderboard: false,
-  datingDeviceFocus: "",
-  datingPayments: "",
+  // Project Details
+  projectDescription: "",
+  keyPages: "",
+  userInteraction: "",
+  competitorSites: "",
 
-  // Podcast
-  podcastHosting: "",
-  podcastHowItWorks: "",
-  podcastParticipateWhileListening: "",
-  podcastSubmitAnswers: "",
-  podcastScoringResults: "",
-  podcastAccounts: "",
-  podcastEpisodePages: false,
-  podcastGamePerEpisode: false,
-  podcastCommunity: false,
-  podcastAdminUpload: "",
+  // Features & Functionality
+  userAccounts: "",
+  ecommerce: false,
+  bookingScheduling: false,
+  contactForms: false,
+  searchFiltering: false,
+  mapsLocation: false,
+  socialMediaIntegration: false,
+  blogNews: false,
+  gallery: false,
+  videoAudio: false,
+  multiLanguage: false,
+  chatMessaging: false,
+  reviewsTestimonials: false,
+  memberArea: false,
+  paymentProcessing: false,
+  deviceFocus: "",
+  additionalFeatures: "",
 
-  // Design
+  // Design Preferences
   stylePreference: "",
   styleOther: "",
   colorPreferences: "",
   simpleOrFeatureRich: "",
   animations: "",
+  designInspiration: "",
 
-  // Technical
+  // Technical Requirements
   userLogins: "",
   adminPanel: "",
-  saveProgress: "",
   emailNotifications: "",
   socialLogin: "",
   scalability: "",
+  thirdPartyIntegrations: "",
+
+  // Content & Assets
+  hasContent: "",
+  needsCopywriting: "",
+  hasPhotos: "",
+  needsStockPhotos: "",
+  hasSEOPlan: "",
 
   // Timeline
   launchDate: "",
   hardDeadline: "",
-  prioritySite: "",
+  phasedLaunch: "",
 
   // Budget
   budgetRange: "",
   customBudget: "",
 
-  // Final
+  // Final Questions
   hostingSetup: "",
   domainPurchase: "",
   ongoingMaintenance: "",
   futureApp: "",
   anythingElse: "",
 };
-
-function MultiCheckbox({ options, values, onChange }) {
-  const toggle = (option) => {
-    if (values.includes(option)) {
-      onChange(values.filter((v) => v !== option));
-    } else {
-      onChange([...values, option]);
-    }
-  };
-
-  return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {options.map((option) => (
-        <label
-          key={option}
-          className="flex items-start gap-3 rounded-2xl border-2 border-black bg-white p-4 cursor-pointer hover:shadow-md transition"
-        >
-          <Checkbox checked={values.includes(option)} onCheckedChange={() => toggle(option)} />
-          <span className="text-sm leading-5">{option}</span>
-        </label>
-      ))}
-    </div>
-  );
-}
 
 function Field({ label, children, hint }) {
   return (
@@ -231,47 +218,55 @@ const fieldLabels = {
   contactNumber: "Contact Number",
   email: "Email",
   currentWebsite: "Current Website",
-  separateOrConnected: "Separate or Connected?",
-  goalDating: "Main Goal — Dating Game",
-  goalPodcast: "Main Goal — Podcast Game",
+  companyName: "Company / Brand Name",
+  projectType: "Project Type",
+  projectTypeOther: "Project Type (Other)",
+  projectGoal: "Main Goal",
+  targetAudience: "Target Audience",
   exampleSites: "Example Sites",
   hasBranding: "Has Branding?",
   brandingHelp: "Branding Help Needed?",
-  datingHowItWorks: "How the Dating Game Works",
-  datingAccounts: "User Accounts",
-  datingProfiles: "User Profiles",
-  datingInteraction: "User Interaction",
-  datingPurpose: "Purpose",
-  datingMatchingSystem: "Matching System",
-  datingSwipeFeature: "Swipe Feature",
-  datingGameRounds: "Questions / Game Rounds",
-  datingLeaderboard: "Leaderboard",
-  datingDeviceFocus: "Device Focus",
-  datingPayments: "Payment Features",
-  podcastHosting: "Podcast Hosting",
-  podcastHowItWorks: "How the Game Works",
-  podcastParticipateWhileListening: "Participate While Listening",
-  podcastSubmitAnswers: "Submit Answers",
-  podcastScoringResults: "Scoring / Results",
-  podcastAccounts: "User Accounts",
-  podcastEpisodePages: "Episode Pages",
-  podcastGamePerEpisode: "Game Per Episode",
-  podcastCommunity: "Community Interaction",
-  podcastAdminUpload: "Admin Upload Access",
+  projectDescription: "Project Description",
+  keyPages: "Key Pages / Sections",
+  userInteraction: "User Interaction",
+  competitorSites: "Competitor Sites",
+  userAccounts: "User Accounts",
+  ecommerce: "E-Commerce / Online Store",
+  bookingScheduling: "Booking / Scheduling",
+  contactForms: "Contact Forms",
+  searchFiltering: "Search & Filtering",
+  mapsLocation: "Maps / Location",
+  socialMediaIntegration: "Social Media Integration",
+  blogNews: "Blog / News Section",
+  gallery: "Photo / Video Gallery",
+  videoAudio: "Video / Audio Player",
+  multiLanguage: "Multi-Language Support",
+  chatMessaging: "Chat / Messaging",
+  reviewsTestimonials: "Reviews / Testimonials",
+  memberArea: "Member-Only Area",
+  paymentProcessing: "Payment Processing",
+  deviceFocus: "Device Focus",
+  additionalFeatures: "Additional Features",
   stylePreference: "Style Preference",
   styleOther: "Other Style",
   colorPreferences: "Color Preferences",
   simpleOrFeatureRich: "Simple or Feature-Rich",
   animations: "Animations / Interactive Elements",
+  designInspiration: "Design Inspiration",
   userLogins: "User Logins",
   adminPanel: "Admin / Dashboard Panel",
-  saveProgress: "Save Progress",
   emailNotifications: "Email Notifications",
   socialLogin: "Social Login",
   scalability: "Scale to Many Users",
+  thirdPartyIntegrations: "Third-Party Integrations",
+  hasContent: "Content Ready?",
+  needsCopywriting: "Needs Copywriting?",
+  hasPhotos: "Has Photos / Media?",
+  needsStockPhotos: "Needs Stock Photos?",
+  hasSEOPlan: "SEO Plan?",
   launchDate: "Ideal Launch Date",
   hardDeadline: "Hard Deadline",
-  prioritySite: "Priority Site",
+  phasedLaunch: "Phased Launch?",
   budgetRange: "Budget Range",
   customBudget: "Custom Budget",
   hostingSetup: "Hosting Setup",
@@ -281,46 +276,50 @@ const fieldLabels = {
   anythingElse: "Additional Notes",
 };
 
-function ReviewSection({ form }) {
-  const sectionGroups = [
-    {
-      title: "Client Info",
-      keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite"],
-    },
-    {
-      title: "Project Overview",
-      keys: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
-    },
-    {
-      title: "Dating Game Website",
-      keys: ["datingHowItWorks", "datingAccounts", "datingProfiles", "datingInteraction", "datingPurpose", "datingMatchingSystem", "datingSwipeFeature", "datingGameRounds", "datingLeaderboard", "datingDeviceFocus", "datingPayments"],
-    },
-    {
-      title: "Podcast Relationship Game",
-      keys: ["podcastHosting", "podcastHowItWorks", "podcastParticipateWhileListening", "podcastSubmitAnswers", "podcastScoringResults", "podcastAccounts", "podcastEpisodePages", "podcastGamePerEpisode", "podcastCommunity", "podcastAdminUpload"],
-    },
-    {
-      title: "Design Preferences",
-      keys: ["stylePreference", "styleOther", "colorPreferences", "simpleOrFeatureRich", "animations"],
-    },
-    {
-      title: "Technical Questions",
-      keys: ["userLogins", "adminPanel", "saveProgress", "emailNotifications", "socialLogin", "scalability"],
-    },
-    {
-      title: "Timeline",
-      keys: ["launchDate", "hardDeadline", "prioritySite"],
-    },
-    {
-      title: "Budget",
-      keys: ["budgetRange", "customBudget"],
-    },
-    {
-      title: "Final Questions",
-      keys: ["hostingSetup", "domainPurchase", "ongoingMaintenance", "futureApp", "anythingElse"],
-    },
-  ];
+const sectionGroups = [
+  {
+    title: "Client Info",
+    keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite", "companyName"],
+  },
+  {
+    title: "Project Overview",
+    keys: ["projectType", "projectTypeOther", "projectGoal", "targetAudience", "exampleSites", "hasBranding", "brandingHelp"],
+  },
+  {
+    title: "Project Details",
+    keys: ["projectDescription", "keyPages", "userInteraction", "competitorSites"],
+  },
+  {
+    title: "Features & Functionality",
+    keys: ["userAccounts", "ecommerce", "bookingScheduling", "contactForms", "searchFiltering", "mapsLocation", "socialMediaIntegration", "blogNews", "gallery", "videoAudio", "multiLanguage", "chatMessaging", "reviewsTestimonials", "memberArea", "paymentProcessing", "deviceFocus", "additionalFeatures"],
+  },
+  {
+    title: "Design Preferences",
+    keys: ["stylePreference", "styleOther", "colorPreferences", "simpleOrFeatureRich", "animations", "designInspiration"],
+  },
+  {
+    title: "Technical Requirements",
+    keys: ["userLogins", "adminPanel", "emailNotifications", "socialLogin", "scalability", "thirdPartyIntegrations"],
+  },
+  {
+    title: "Content & Assets",
+    keys: ["hasContent", "needsCopywriting", "hasPhotos", "needsStockPhotos", "hasSEOPlan"],
+  },
+  {
+    title: "Timeline",
+    keys: ["launchDate", "hardDeadline", "phasedLaunch"],
+  },
+  {
+    title: "Budget",
+    keys: ["budgetRange", "customBudget"],
+  },
+  {
+    title: "Final Questions",
+    keys: ["hostingSetup", "domainPurchase", "ongoingMaintenance", "futureApp", "anythingElse"],
+  },
+];
 
+function ReviewSection({ form }) {
   return (
     <div className="space-y-8">
       {sectionGroups.map((group) => {
@@ -363,7 +362,6 @@ export default function Questionnaire() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [form, setForm] = useState(initialData);
-
   const [attempted, setAttempted] = useState({});
 
   const progress = useMemo(() => ((step + 1) / sections.length) * 100, [step]);
@@ -378,39 +376,21 @@ export default function Questionnaire() {
     });
   };
 
-  // Extra validation: if budget is "custom", customBudget is also required
   const isCurrentStepValid = useMemo(() => {
     const sectionId = sections[step].id;
     if (!isStepComplete(sectionId)) return false;
     if (sectionId === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) return false;
     if (sectionId === "design" && form.stylePreference === "other" && !form.styleOther.trim()) return false;
+    if (sectionId === "overview" && form.projectType === "other" && !form.projectTypeOther.trim()) return false;
     return true;
   }, [step, form]);
 
-  const getMissingFields = (sectionId) => {
-    const fields = requiredFields[sectionId] || [];
-    const missing = fields.filter((key) => {
-      const val = form[key];
-      if (typeof val === "boolean") return false;
-      if (typeof val === "string") return val.trim() === "";
-      return !val;
-    });
-    if (sectionId === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) {
-      missing.push("customBudget");
-    }
-    if (sectionId === "design" && form.stylePreference === "other" && !form.styleOther.trim()) {
-      missing.push("styleOther");
-    }
-    return missing;
-  };
-
-  // Highest step the user has fully completed (allows going back but not skipping ahead)
   const highestReachableStep = useMemo(() => {
     for (let i = 0; i < sections.length; i++) {
       if (!isStepComplete(sections[i].id)) return i;
-      // check conditional fields too
       if (sections[i].id === "budget" && form.budgetRange === "custom" && !form.customBudget.trim()) return i;
       if (sections[i].id === "design" && form.stylePreference === "other" && !form.styleOther.trim()) return i;
+      if (sections[i].id === "overview" && form.projectType === "other" && !form.projectTypeOther.trim()) return i;
     }
     return sections.length - 1;
   }, [form]);
@@ -442,11 +422,9 @@ export default function Questionnaire() {
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));
   const goToStep = (index) => {
-    // Can always go back, but can only go forward if all prior steps are complete
     if (index <= step || index <= highestReachableStep) {
       setStep(index);
     } else {
-      // Mark current step as attempted to show validation
       setAttempted((prev) => ({ ...prev, [sections[step].id]: true }));
     }
   };
@@ -477,6 +455,13 @@ export default function Questionnaire() {
                 />
               </Field>
             </div>
+            <Field label="Company / Brand Name" hint="Optional">
+              <Input
+                value={form.companyName}
+                onChange={(e) => update("companyName", e.target.value)}
+                placeholder="Your business or brand name"
+              />
+            </Field>
             <Field label="Contact Number">
               <Input
                 type="tel"
@@ -508,38 +493,46 @@ export default function Questionnaire() {
         return (
           <>
             <RadioField
-              label="Are these two completely separate websites or should they connect together?"
-              value={form.separateOrConnected}
-              onChange={(v) => update("separateOrConnected", v)}
+              label="What type of project is this?"
+              value={form.projectType}
+              onChange={(v) => update("projectType", v)}
               options={[
-                { value: "separate", label: "Completely separate websites" },
-                { value: "connected", label: "They should connect together" },
-                { value: "unsure", label: "Not sure yet" },
+                { value: "new-website", label: "New website from scratch" },
+                { value: "redesign", label: "Redesign / rebuild existing site" },
+                { value: "web-app", label: "Web application" },
+                { value: "ecommerce", label: "Online store / e-commerce" },
+                { value: "landing-page", label: "Landing page / single page" },
+                { value: "portfolio", label: "Portfolio / showcase" },
+                { value: "blog", label: "Blog / content site" },
+                { value: "other", label: "Other" },
               ]}
             />
-            <Field label="What is the main goal of each site?">
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">Dating Game:</Label>
-                  <Textarea
-                    value={form.goalDating}
-                    onChange={(e) => update("goalDating", e.target.value)}
-                    placeholder="What should the dating game achieve?"
-                    className="min-h-[80px]"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs text-muted-foreground">Podcast Game:</Label>
-                  <Textarea
-                    value={form.goalPodcast}
-                    onChange={(e) => update("goalPodcast", e.target.value)}
-                    placeholder="What should the podcast game achieve?"
-                    className="min-h-[80px]"
-                  />
-                </div>
-              </div>
+            {form.projectType === "other" && (
+              <Field label="Describe your project type:">
+                <Input
+                  value={form.projectTypeOther}
+                  onChange={(e) => update("projectTypeOther", e.target.value)}
+                  placeholder="What kind of project?"
+                />
+              </Field>
+            )}
+            <Field label="What is the main goal of this project?" hint="What should the site accomplish?">
+              <Textarea
+                value={form.projectGoal}
+                onChange={(e) => update("projectGoal", e.target.value)}
+                placeholder="e.g., Generate leads, sell products, showcase work, provide information..."
+                className="min-h-[100px]"
+              />
             </Field>
-            <Field label="Do you have examples of websites you like?" hint="Links help a lot">
+            <Field label="Who is your target audience?">
+              <Textarea
+                value={form.targetAudience}
+                onChange={(e) => update("targetAudience", e.target.value)}
+                placeholder="Describe your ideal user or customer"
+                className="min-h-[80px]"
+              />
+            </Field>
+            <Field label="Do you have examples of websites you like?" hint="Links help a lot — optional">
               <Textarea
                 value={form.exampleSites}
                 onChange={(e) => update("exampleSites", e.target.value)}
@@ -570,162 +563,92 @@ export default function Questionnaire() {
           </>
         );
 
-      case "dating":
+      case "details":
         return (
           <>
-            <Field label="How does the dating game work?" hint="Brief explanation">
+            <Field label="Describe your project in detail" hint="The more detail, the better">
               <Textarea
-                value={form.datingHowItWorks}
-                onChange={(e) => update("datingHowItWorks", e.target.value)}
-                placeholder="Describe the concept and flow"
+                value={form.projectDescription}
+                onChange={(e) => update("projectDescription", e.target.value)}
+                placeholder="Tell us about your vision, what problem it solves, and how it should work"
+                className="min-h-[120px]"
+              />
+            </Field>
+            <Field label="What key pages or sections do you need?" hint="e.g., Home, About, Services, Contact, Shop, Blog, FAQ...">
+              <Textarea
+                value={form.keyPages}
+                onChange={(e) => update("keyPages", e.target.value)}
+                placeholder="List the main pages and what each should include"
                 className="min-h-[100px]"
               />
             </Field>
-            <RadioField
-              label="Will users need to create accounts?"
-              value={form.datingAccounts}
-              onChange={(v) => update("datingAccounts", v)}
-              options={yesNoOptions}
-            />
-            <RadioField
-              label="Will there be profiles for users?"
-              value={form.datingProfiles}
-              onChange={(v) => update("datingProfiles", v)}
-              options={yesNoOptions}
-            />
-            <Field label="Will users interact with each other?" hint="Chat, voting, matching, etc.">
+            <Field label="How will users interact with the site?" hint="Browse, purchase, sign up, submit forms, etc.">
               <Textarea
-                value={form.datingInteraction}
-                onChange={(e) => update("datingInteraction", e.target.value)}
-                placeholder="Describe how users interact"
+                value={form.userInteraction}
+                onChange={(e) => update("userInteraction", e.target.value)}
+                placeholder="Describe the main user journey"
                 className="min-h-[80px]"
               />
             </Field>
-            <RadioField
-              label="Is this:"
-              value={form.datingPurpose}
-              onChange={(v) => update("datingPurpose", v)}
-              options={[
-                { value: "fun", label: "Just for fun" },
-                { value: "competitive", label: "Competitive" },
-                { value: "paid", label: "Paid to play" },
-              ]}
-            />
-            <Field label="Will there be:">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <CheckboxField
-                  label="Matching system"
-                  checked={form.datingMatchingSystem}
-                  onChange={(v) => update("datingMatchingSystem", v)}
-                />
-                <CheckboxField
-                  label="Swipe feature"
-                  checked={form.datingSwipeFeature}
-                  onChange={(v) => update("datingSwipeFeature", v)}
-                />
-                <CheckboxField
-                  label="Questions / game rounds"
-                  checked={form.datingGameRounds}
-                  onChange={(v) => update("datingGameRounds", v)}
-                />
-                <CheckboxField
-                  label="Leaderboard"
-                  checked={form.datingLeaderboard}
-                  onChange={(v) => update("datingLeaderboard", v)}
-                />
-              </div>
-            </Field>
-            <RadioField
-              label="Mobile-first or desktop focus? (or both)"
-              value={form.datingDeviceFocus}
-              onChange={(v) => update("datingDeviceFocus", v)}
-              options={[
-                { value: "mobile", label: "Mobile-first" },
-                { value: "desktop", label: "Desktop focus" },
-                { value: "both", label: "Both" },
-              ]}
-            />
-            <Field label="Any payment features?" hint="Subscriptions, entry fees, etc.">
+            <Field label="Any competitor or similar sites?" hint="Optional — helps us understand your space">
               <Textarea
-                value={form.datingPayments}
-                onChange={(e) => update("datingPayments", e.target.value)}
-                placeholder="Describe any payment or monetization plans"
+                value={form.competitorSites}
+                onChange={(e) => update("competitorSites", e.target.value)}
+                placeholder="Links to competitors or similar businesses"
                 className="min-h-[80px]"
               />
             </Field>
           </>
         );
 
-      case "podcast":
+      case "features":
         return (
           <>
             <RadioField
-              label="Will the podcast be:"
-              value={form.podcastHosting}
-              onChange={(v) => update("podcastHosting", v)}
+              label="Will users need to create accounts?"
+              value={form.userAccounts}
+              onChange={(v) => update("userAccounts", v)}
               options={[
-                { value: "hosted", label: "Hosted on the site" },
-                { value: "embedded", label: "Embedded from Spotify / YouTube" },
-                { value: "both", label: "Both" },
+                ...yesNoOptions,
+                { value: "maybe", label: "Maybe / not sure yet" },
               ]}
             />
-            <Field label="How does the relationship game work?">
-              <Textarea
-                value={form.podcastHowItWorks}
-                onChange={(e) => update("podcastHowItWorks", e.target.value)}
-                placeholder="Describe the game concept"
-                className="min-h-[100px]"
-              />
-            </Field>
-            <RadioField
-              label="Will users participate while listening?"
-              value={form.podcastParticipateWhileListening}
-              onChange={(v) => update("podcastParticipateWhileListening", v)}
-              options={yesNoOptions}
-            />
-            <RadioField
-              label="Will users submit answers?"
-              value={form.podcastSubmitAnswers}
-              onChange={(v) => update("podcastSubmitAnswers", v)}
-              options={yesNoOptions}
-            />
-            <RadioField
-              label="Will there be scoring or results?"
-              value={form.podcastScoringResults}
-              onChange={(v) => update("podcastScoringResults", v)}
-              options={yesNoOptions}
-            />
-            <RadioField
-              label="Will users need accounts?"
-              value={form.podcastAccounts}
-              onChange={(v) => update("podcastAccounts", v)}
-              options={yesNoOptions}
-            />
-            <Field label="Do you want:">
+            <Field label="Which features do you need?" hint="Check all that apply">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <CheckboxField
-                  label="Episode pages"
-                  checked={form.podcastEpisodePages}
-                  onChange={(v) => update("podcastEpisodePages", v)}
-                />
-                <CheckboxField
-                  label="Game per episode"
-                  checked={form.podcastGamePerEpisode}
-                  onChange={(v) => update("podcastGamePerEpisode", v)}
-                />
-                <CheckboxField
-                  label="Community interaction"
-                  checked={form.podcastCommunity}
-                  onChange={(v) => update("podcastCommunity", v)}
-                />
+                <CheckboxField label="E-Commerce / Online Store" checked={form.ecommerce} onChange={(v) => update("ecommerce", v)} />
+                <CheckboxField label="Booking / Scheduling" checked={form.bookingScheduling} onChange={(v) => update("bookingScheduling", v)} />
+                <CheckboxField label="Contact Forms" checked={form.contactForms} onChange={(v) => update("contactForms", v)} />
+                <CheckboxField label="Search & Filtering" checked={form.searchFiltering} onChange={(v) => update("searchFiltering", v)} />
+                <CheckboxField label="Maps / Location" checked={form.mapsLocation} onChange={(v) => update("mapsLocation", v)} />
+                <CheckboxField label="Social Media Integration" checked={form.socialMediaIntegration} onChange={(v) => update("socialMediaIntegration", v)} />
+                <CheckboxField label="Blog / News Section" checked={form.blogNews} onChange={(v) => update("blogNews", v)} />
+                <CheckboxField label="Photo / Video Gallery" checked={form.gallery} onChange={(v) => update("gallery", v)} />
+                <CheckboxField label="Video / Audio Player" checked={form.videoAudio} onChange={(v) => update("videoAudio", v)} />
+                <CheckboxField label="Multi-Language Support" checked={form.multiLanguage} onChange={(v) => update("multiLanguage", v)} />
+                <CheckboxField label="Chat / Messaging" checked={form.chatMessaging} onChange={(v) => update("chatMessaging", v)} />
+                <CheckboxField label="Reviews / Testimonials" checked={form.reviewsTestimonials} onChange={(v) => update("reviewsTestimonials", v)} />
+                <CheckboxField label="Member-Only Area" checked={form.memberArea} onChange={(v) => update("memberArea", v)} />
+                <CheckboxField label="Payment Processing" checked={form.paymentProcessing} onChange={(v) => update("paymentProcessing", v)} />
               </div>
             </Field>
             <RadioField
-              label="Will you need admin access to upload new episodes?"
-              value={form.podcastAdminUpload}
-              onChange={(v) => update("podcastAdminUpload", v)}
-              options={yesNoOptions}
+              label="Mobile-first or desktop focus?"
+              value={form.deviceFocus}
+              onChange={(v) => update("deviceFocus", v)}
+              options={[
+                { value: "mobile", label: "Mobile-first" },
+                { value: "desktop", label: "Desktop focus" },
+                { value: "both", label: "Both equally" },
+              ]}
             />
+            <Field label="Any other features not listed above?" hint="Optional">
+              <Textarea
+                value={form.additionalFeatures}
+                onChange={(e) => update("additionalFeatures", e.target.value)}
+                placeholder="Describe any custom features you need"
+                className="min-h-[80px]"
+              />
+            </Field>
           </>
         );
 
@@ -737,10 +660,12 @@ export default function Questionnaire() {
               value={form.stylePreference}
               onChange={(v) => update("stylePreference", v)}
               options={[
-                { value: "modern", label: "Modern" },
+                { value: "modern", label: "Modern & clean" },
                 { value: "fun", label: "Fun / playful" },
                 { value: "minimal", label: "Minimal" },
-                { value: "bold", label: "Bold" },
+                { value: "bold", label: "Bold & vibrant" },
+                { value: "corporate", label: "Corporate / professional" },
+                { value: "luxury", label: "Luxury / elegant" },
                 { value: "other", label: "Other" },
               ]}
             />
@@ -757,7 +682,7 @@ export default function Questionnaire() {
               <Input
                 value={form.colorPreferences}
                 onChange={(e) => update("colorPreferences", e.target.value)}
-                placeholder="e.g., dark tones, bright and bold, earth tones..."
+                placeholder="e.g., dark tones, bright and bold, earth tones, match existing brand..."
               />
             </Field>
             <RadioField
@@ -771,7 +696,7 @@ export default function Questionnaire() {
               ]}
             />
             <RadioField
-              label="Do you need animations or interactive elements?"
+              label="Do you want animations or interactive elements?"
               value={form.animations}
               onChange={(v) => update("animations", v)}
               options={[
@@ -780,6 +705,14 @@ export default function Questionnaire() {
                 { value: "no", label: "No, keep it simple" },
               ]}
             />
+            <Field label="Any design inspiration?" hint="Optional — links, screenshots, Pinterest boards, etc.">
+              <Textarea
+                value={form.designInspiration}
+                onChange={(e) => update("designInspiration", e.target.value)}
+                placeholder="Share anything that shows the look and feel you want"
+                className="min-h-[80px]"
+              />
+            </Field>
           </>
         );
 
@@ -793,25 +726,19 @@ export default function Questionnaire() {
               options={yesNoOptions}
             />
             <RadioField
-              label="Do you need a dashboard / admin panel?"
+              label="Do you need an admin dashboard / content management?"
               value={form.adminPanel}
               onChange={(v) => update("adminPanel", v)}
               options={yesNoOptions}
             />
             <RadioField
-              label="Will users save progress?"
-              value={form.saveProgress}
-              onChange={(v) => update("saveProgress", v)}
-              options={yesNoOptions}
-            />
-            <RadioField
-              label="Email notifications needed?"
+              label="Email notifications needed?" hint="Order confirmations, form submissions, etc."
               value={form.emailNotifications}
               onChange={(v) => update("emailNotifications", v)}
               options={yesNoOptions}
             />
             <RadioField
-              label="Social login?" hint="Google, Apple, etc."
+              label="Social login?" hint="Google, Apple, Facebook, etc."
               value={form.socialLogin}
               onChange={(v) => update("socialLogin", v)}
               options={yesNoOptions}
@@ -824,6 +751,66 @@ export default function Questionnaire() {
                 { value: "yes", label: "Yes, expecting high traffic" },
                 { value: "eventually", label: "Eventually, but starting small" },
                 { value: "no", label: "No, small audience" },
+              ]}
+            />
+            <Field label="Any third-party integrations?" hint="Optional — CRM, payment, analytics, APIs, etc.">
+              <Textarea
+                value={form.thirdPartyIntegrations}
+                onChange={(e) => update("thirdPartyIntegrations", e.target.value)}
+                placeholder="e.g., Stripe, Mailchimp, Google Analytics, Zapier, Salesforce..."
+                className="min-h-[80px]"
+              />
+            </Field>
+          </>
+        );
+
+      case "content":
+        return (
+          <>
+            <RadioField
+              label="Do you have website content ready?" hint="Text, copy, descriptions, etc."
+              value={form.hasContent}
+              onChange={(v) => update("hasContent", v)}
+              options={[
+                { value: "yes", label: "Yes, all content is ready" },
+                { value: "partial", label: "Some content, but not all" },
+                { value: "no", label: "No, I need to create it" },
+              ]}
+            />
+            <RadioField
+              label="Do you need copywriting or content creation?"
+              value={form.needsCopywriting}
+              onChange={(v) => update("needsCopywriting", v)}
+              options={[
+                { value: "yes", label: "Yes, I need help writing content" },
+                { value: "some", label: "Just some pages or sections" },
+                { value: "no", label: "No, I'll provide all content" },
+              ]}
+            />
+            <RadioField
+              label="Do you have photos and media?" hint="Optional"
+              value={form.hasPhotos}
+              onChange={(v) => update("hasPhotos", v)}
+              options={[
+                { value: "yes", label: "Yes, I have photos/videos ready" },
+                { value: "some", label: "Some, but need more" },
+                { value: "no", label: "No, I need help sourcing them" },
+              ]}
+            />
+            <RadioField
+              label="Do you need stock photos?" hint="Optional"
+              value={form.needsStockPhotos}
+              onChange={(v) => update("needsStockPhotos", v)}
+              options={yesNoOptions}
+            />
+            <RadioField
+              label="Do you have an SEO strategy?" hint="Optional"
+              value={form.hasSEOPlan}
+              onChange={(v) => update("hasSEOPlan", v)}
+              options={[
+                { value: "yes", label: "Yes, I have keywords and a plan" },
+                { value: "need-help", label: "No, I need help with SEO" },
+                { value: "not-needed", label: "Not a priority right now" },
               ]}
             />
           </>
@@ -850,13 +837,13 @@ export default function Questionnaire() {
               ]}
             />
             <RadioField
-              label="Which site is priority?"
-              value={form.prioritySite}
-              onChange={(v) => update("prioritySite", v)}
+              label="Are you open to a phased launch?" hint="Optional — launch core features first, add more later"
+              value={form.phasedLaunch}
+              onChange={(v) => update("phasedLaunch", v)}
               options={[
-                { value: "dating", label: "Dating Game" },
-                { value: "podcast", label: "Podcast Game" },
-                { value: "both", label: "Both equally" },
+                { value: "yes", label: "Yes, let's start with MVP" },
+                { value: "prefer-full", label: "Prefer full launch" },
+                { value: "unsure", label: "Open to either" },
               ]}
             />
           </>
@@ -865,16 +852,17 @@ export default function Questionnaire() {
       case "budget":
         return (
           <>
-            <p className="text-sm text-muted-foreground">This helps me recommend the right solution.</p>
+            <p className="text-sm text-muted-foreground">This helps us recommend the right solution for your needs.</p>
             <RadioField
               label="What budget range are you comfortable with?"
               value={form.budgetRange}
               onChange={(v) => update("budgetRange", v)}
               options={[
-                { value: "500-1000", label: "$500 - $1,000 (basic MVP)" },
-                { value: "1000-3000", label: "$1,000 - $3,000 (custom features)" },
-                { value: "3000-6000", label: "$3,000 - $6,000 (advanced interactive)" },
-                { value: "6000+", label: "$6,000+ (full platform build)" },
+                { value: "500-1000", label: "$500 - $1,000 (basic site / landing page)" },
+                { value: "1000-3000", label: "$1,000 - $3,000 (custom site with features)" },
+                { value: "3000-6000", label: "$3,000 - $6,000 (advanced / interactive)" },
+                { value: "6000-10000", label: "$6,000 - $10,000 (complex web app)" },
+                { value: "10000+", label: "$10,000+ (full platform build)" },
                 { value: "custom", label: "Other / my own range" },
               ]}
             />
@@ -912,7 +900,7 @@ export default function Questionnaire() {
               options={yesNoOptions}
             />
             <RadioField
-              label="Will this expand into an app later?"
+              label="Will this expand into a mobile app later?"
               value={form.futureApp}
               onChange={(v) => update("futureApp", v)}
               options={[
@@ -921,11 +909,11 @@ export default function Questionnaire() {
                 { value: "no", label: "No" },
               ]}
             />
-            <Field label="Anything else you'd like included?">
+            <Field label="Anything else you'd like us to know?">
               <Textarea
                 value={form.anythingElse}
                 onChange={(e) => update("anythingElse", e.target.value)}
-                placeholder="Any other ideas, features, or notes..."
+                placeholder="Any other ideas, requirements, concerns, or notes..."
                 className="min-h-[120px]"
               />
             </Field>
@@ -1020,7 +1008,7 @@ export default function Questionnaire() {
 
         <div className="relative grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <ScribbleArrow />
-          {/* Desktop sidebar — hidden on mobile */}
+          {/* Desktop sidebar */}
           <Card className="hidden lg:block h-fit rounded-3xl shadow-sm border-2 border-black bg-white">
             <CardHeader>
               <CardTitle className="text-xl">a creative mess</CardTitle>
@@ -1089,7 +1077,7 @@ export default function Questionnaire() {
 
                 {attempted[sections[step].id] && !isCurrentStepValid && (
                   <div className="rounded-2xl border-2 border-amber-400 bg-amber-50 p-4 text-amber-800 text-sm">
-                    Please answer all questions before continuing.
+                    Please answer all required questions before continuing.
                   </div>
                 )}
 

@@ -13,47 +13,55 @@ const fieldLabels = {
   contactNumber: "Contact Number",
   email: "Email",
   currentWebsite: "Current Website",
-  separateOrConnected: "Separate or Connected?",
-  goalDating: "Main Goal — Dating Game",
-  goalPodcast: "Main Goal — Podcast Game",
+  companyName: "Company / Brand Name",
+  projectType: "Project Type",
+  projectTypeOther: "Project Type (Other)",
+  projectGoal: "Main Goal",
+  targetAudience: "Target Audience",
   exampleSites: "Example Sites",
   hasBranding: "Has Branding?",
   brandingHelp: "Branding Help Needed?",
-  datingHowItWorks: "How the Dating Game Works",
-  datingAccounts: "User Accounts",
-  datingProfiles: "User Profiles",
-  datingInteraction: "User Interaction",
-  datingPurpose: "Purpose",
-  datingMatchingSystem: "Matching System",
-  datingSwipeFeature: "Swipe Feature",
-  datingGameRounds: "Questions / Game Rounds",
-  datingLeaderboard: "Leaderboard",
-  datingDeviceFocus: "Device Focus",
-  datingPayments: "Payment Features",
-  podcastHosting: "Podcast Hosting",
-  podcastHowItWorks: "How the Game Works",
-  podcastParticipateWhileListening: "Participate While Listening",
-  podcastSubmitAnswers: "Submit Answers",
-  podcastScoringResults: "Scoring / Results",
-  podcastAccounts: "User Accounts",
-  podcastEpisodePages: "Episode Pages",
-  podcastGamePerEpisode: "Game Per Episode",
-  podcastCommunity: "Community Interaction",
-  podcastAdminUpload: "Admin Upload Access",
+  projectDescription: "Project Description",
+  keyPages: "Key Pages / Sections",
+  userInteraction: "User Interaction",
+  competitorSites: "Competitor Sites",
+  userAccounts: "User Accounts",
+  ecommerce: "E-Commerce / Online Store",
+  bookingScheduling: "Booking / Scheduling",
+  contactForms: "Contact Forms",
+  searchFiltering: "Search & Filtering",
+  mapsLocation: "Maps / Location",
+  socialMediaIntegration: "Social Media Integration",
+  blogNews: "Blog / News Section",
+  gallery: "Photo / Video Gallery",
+  videoAudio: "Video / Audio Player",
+  multiLanguage: "Multi-Language Support",
+  chatMessaging: "Chat / Messaging",
+  reviewsTestimonials: "Reviews / Testimonials",
+  memberArea: "Member-Only Area",
+  paymentProcessing: "Payment Processing",
+  deviceFocus: "Device Focus",
+  additionalFeatures: "Additional Features",
   stylePreference: "Style Preference",
   styleOther: "Other Style",
   colorPreferences: "Color Preferences",
   simpleOrFeatureRich: "Simple or Feature-Rich",
   animations: "Animations / Interactive Elements",
+  designInspiration: "Design Inspiration",
   userLogins: "User Logins",
   adminPanel: "Admin / Dashboard Panel",
-  saveProgress: "Save Progress",
   emailNotifications: "Email Notifications",
   socialLogin: "Social Login",
   scalability: "Scale to Many Users",
+  thirdPartyIntegrations: "Third-Party Integrations",
+  hasContent: "Content Ready?",
+  needsCopywriting: "Needs Copywriting?",
+  hasPhotos: "Has Photos / Media?",
+  needsStockPhotos: "Needs Stock Photos?",
+  hasSEOPlan: "SEO Plan?",
   launchDate: "Ideal Launch Date",
   hardDeadline: "Hard Deadline",
-  prioritySite: "Priority Site",
+  phasedLaunch: "Phased Launch?",
   budgetRange: "Budget Range",
   customBudget: "Custom Budget",
   hostingSetup: "Hosting Setup",
@@ -66,31 +74,35 @@ const fieldLabels = {
 const sectionOrder = [
   {
     title: "Client Info",
-    keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite"],
+    keys: ["firstName", "lastName", "contactNumber", "email", "currentWebsite", "companyName"],
   },
   {
     title: "Project Overview",
-    keys: ["separateOrConnected", "goalDating", "goalPodcast", "exampleSites", "hasBranding", "brandingHelp"],
+    keys: ["projectType", "projectTypeOther", "projectGoal", "targetAudience", "exampleSites", "hasBranding", "brandingHelp"],
   },
   {
-    title: "Dating Game Website",
-    keys: ["datingHowItWorks", "datingAccounts", "datingProfiles", "datingInteraction", "datingPurpose", "datingMatchingSystem", "datingSwipeFeature", "datingGameRounds", "datingLeaderboard", "datingDeviceFocus", "datingPayments"],
+    title: "Project Details",
+    keys: ["projectDescription", "keyPages", "userInteraction", "competitorSites"],
   },
   {
-    title: "Podcast Relationship Game",
-    keys: ["podcastHosting", "podcastHowItWorks", "podcastParticipateWhileListening", "podcastSubmitAnswers", "podcastScoringResults", "podcastAccounts", "podcastEpisodePages", "podcastGamePerEpisode", "podcastCommunity", "podcastAdminUpload"],
+    title: "Features & Functionality",
+    keys: ["userAccounts", "ecommerce", "bookingScheduling", "contactForms", "searchFiltering", "mapsLocation", "socialMediaIntegration", "blogNews", "gallery", "videoAudio", "multiLanguage", "chatMessaging", "reviewsTestimonials", "memberArea", "paymentProcessing", "deviceFocus", "additionalFeatures"],
   },
   {
     title: "Design Preferences",
-    keys: ["stylePreference", "styleOther", "colorPreferences", "simpleOrFeatureRich", "animations"],
+    keys: ["stylePreference", "styleOther", "colorPreferences", "simpleOrFeatureRich", "animations", "designInspiration"],
   },
   {
-    title: "Technical Questions",
-    keys: ["userLogins", "adminPanel", "saveProgress", "emailNotifications", "socialLogin", "scalability"],
+    title: "Technical Requirements",
+    keys: ["userLogins", "adminPanel", "emailNotifications", "socialLogin", "scalability", "thirdPartyIntegrations"],
+  },
+  {
+    title: "Content & Assets",
+    keys: ["hasContent", "needsCopywriting", "hasPhotos", "needsStockPhotos", "hasSEOPlan"],
   },
   {
     title: "Timeline",
-    keys: ["launchDate", "hardDeadline", "prioritySite"],
+    keys: ["launchDate", "hardDeadline", "phasedLaunch"],
   },
   {
     title: "Budget",
@@ -123,7 +135,6 @@ function exportPDF(submission) {
     }
   };
 
-  // Header
   doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
   doc.text("a creative mess", margin, y);
@@ -137,6 +148,10 @@ function exportPDF(submission) {
   const clientName = [submission.firstName, submission.lastName].filter(Boolean).join(" ") || "Unknown Client";
   doc.text(`Client: ${clientName}`, margin, y);
   y += 5;
+  if (submission.companyName) {
+    doc.text(`Company: ${submission.companyName}`, margin, y);
+    y += 5;
+  }
   doc.text(
     `Submitted: ${new Date(submission.submittedAt).toLocaleDateString("en-US", {
       month: "long",
@@ -150,7 +165,6 @@ function exportPDF(submission) {
   );
   y += 4;
 
-  // Divider line
   doc.setDrawColor(0);
   doc.setLineWidth(0.5);
   doc.line(margin, y, pageWidth - margin, y);
@@ -167,7 +181,6 @@ function exportPDF(submission) {
 
     checkPage(30);
 
-    // Section title
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
     doc.text(section.title, margin, y);
@@ -183,14 +196,12 @@ function exportPDF(submission) {
 
       checkPage(20);
 
-      // Label
       doc.setFontSize(9);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(100);
       doc.text(label.toUpperCase(), margin, y);
       y += 5;
 
-      // Value (with text wrapping)
       doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0);
@@ -277,6 +288,9 @@ export default function SubmissionDetail() {
             <h1 className="text-2xl md:text-3xl font-bold">
               {[submission.firstName, submission.lastName].filter(Boolean).join(" ") || "Submission"}
             </h1>
+            {submission.companyName && (
+              <p className="text-sm font-medium">{submission.companyName}</p>
+            )}
             <p className="text-sm text-muted-foreground">
               Submitted{" "}
               {new Date(submission.submittedAt).toLocaleDateString("en-US", {

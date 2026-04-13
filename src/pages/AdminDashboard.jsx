@@ -87,9 +87,10 @@ export default function AdminDashboard() {
                   >
                     <div className="font-medium truncate">
                       {[sub.firstName, sub.lastName].filter(Boolean).join(" ") || "New Submission"}
+                      {sub.companyName && <span className="text-muted-foreground font-normal"> — {sub.companyName}</span>}
                     </div>
                     <div className="text-sm text-muted-foreground truncate">
-                      {sub.email || "No email provided"}
+                      {sub.projectType ? sub.projectType.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : sub.email || "No details"}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs">
