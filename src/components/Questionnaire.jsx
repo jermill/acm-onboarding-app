@@ -193,9 +193,29 @@ function ScribbleArrow() {
 export default function Questionnaire() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState(initialData);
 
   const progress = useMemo(() => ((step + 1) / sections.length) * 100, [step]);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/.netlify/functions/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
 
@@ -293,10 +313,18 @@ export default function Questionnaire() {
                     {step < sections.length - 1 ? (
                       <Button onClick={next}>Next</Button>
                     ) : (
-                      <Button onClick={() => setSubmitted(true)}>Submit</Button>
+                      <Button onClick={handleSubmit} disabled={submitting}>
+                        {submitting ? "Submitting..." : "Submit"}
+                      </Button>
                     )}
                   </div>
                 </div>
+
+                {error && (
+                  <div className="rounded-2xl border-2 border-red-500 p-4 bg-red-50 text-red-700">
+                    {error}
+                  </div>
+                )}
 
                 {submitted && (
                   <div className="rounded-2xl border-2 border-black p-4 bg-white">
